@@ -1,0 +1,30 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "LIRI Node HW",
+  "main": "liri.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jayblack388/Node-App.git"
+  },
+  "keywords": [
+    "LIRI",
+    "Node",
+    "Bootcamp"
+  ],
+  "author": "John Blackwell <jblackwell072588@gmail.com> (jayblack388.github.io)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jayblack388/Node-App/issues"
+  },
+  "homepage": "https://github.com/jayblack388/Node-App#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "node-spotify-api": "^1.0.7",
+    "request": "^2.83.0",
+    "twitter": "^1.7.1"
+  }
+}
