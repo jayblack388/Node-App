@@ -4,18 +4,22 @@ const keys = require("./keys.js");
 const Spotify = require('node-spotify-api'); 
 const Twitter = require('twitter'); 
 const fs = require("fs"); 
-const args = process.argv
+const inquirer = require('inquirer');
+const args = process.argv;
 const spotify = new Spotify(keys.spotify); 
 const client = new Twitter(keys.twitter); 
 const movieKey = keys.omdb; 
-const command = args[2]; 
-const input = args[3]; 
+let command = args[2]; 
+let input = args[3]; 
 let inputString = ""; 
 let queryUrl; 
 let movieResponse; 
-let theSign;
+let ranNum;
 
 //--------------------------------------------------- //
+const getRanEvNum = (arr) => {
+	return Math.floor(Math.random() * arr.length) & 0xFE;
+}
 //Show last 20 tweets and when they were created, searches for user inputString 
 // If no tweet input, default to realDonaldTrump
 const tweets = () => {
@@ -79,33 +83,79 @@ const movieThis = () => {
 
 // use fs.readfile to use random.txt to call a command
 const doWhatItSays = () => {
-	console.log(
-
-	)
+	fs.readFile("random.txt", "utf8", function(error, data) {
+	  if (error) {
+	    return console.log(error);
+	  }
+	  var dataArr = data.split(",");
+		ranNum = getRanEvNum(dataArr);
+		command = dataArr[ranNum];
+	  inputString = dataArr[ranNum + 1];
+	  console.log(command + " | " + inputString)
+	  runProg()
+	});
 };
+
+// use fs.writefile to add additional commands to random.txt
+const addRandom = () => {
+	inquirer.prompt([
+
+		{
+			type: "list",
+			name: "newCommand",
+			message: "What command do you want to add?",
+			choices: ["tweets", "spotify-this-song", "movie-this"]
+		},
+		{
+			type: "input",
+			name: "newQuery",
+			message: "What do you want to search?"
+		}
+
+	]).then((added) => {
+		fs.appendFile("random.txt",',' + added.newCommand + ',' + '"' + added.newQuery + '"' , function(err) {
+		  if (err) {
+		    console.log(err);
+		  }
+		  else {
+		    console.log("Command Added!");
+		  }
+
+		});
+	})
+}
+
+// Run the program
+const runProg = () =>{
+	for (let i = 3; i < args.length; i++) {
+		if (i > 3 && i < args.length) {
+			inputString = inputString + "+" + args[i];
+		}else {
+			inputString += args[i];
+		}    
+	};
+
+	switch (command) {
+		case "tweets":
+		  tweets();
+		  break;
+		case "spotify-this-song":
+		  spotifyThisSong();
+		  break;
+		case "movie-this":
+		  movieThis();
+		  break;
+		case "do-what-it-says":
+		  doWhatItSays();
+		  break;
+		case "add-command":
+			addRandom();
+			break
+		default:
+		  console.log("Invalid Request");
+	};
+}
 
 //---------------------------------------------------
-for (let i = 3; i < args.length; i++) {
-	if (i > 3 && i < args.length) {
-		inputString = inputString + "+" + args[i];
-	}else {
-		inputString += args[i];
-	}    
-};
 
-switch (command) {
-	case "tweets":
-	  tweets();
-	  break;
-	case "spotify-this-song":
-	  spotifyThisSong();
-	  break;
-	case "movie-this":
-	  movieThis();
-	  break;
-	case "do-what-it-says":
-	  doWhatItSays();
-	  break
-	default:
-	  console.log("Invalid Request");
-}
+runProg();
