@@ -17,6 +17,7 @@ let movieResponse;
 let ranNum;
 
 //--------------------------------------------------- //
+
 const getRanEvNum = (arr) => {
 	return Math.floor(Math.random() * arr.length) & 0xFE;
 }
@@ -92,7 +93,25 @@ const doWhatItSays = () => {
 		command = dataArr[ranNum];
 	  inputString = dataArr[ranNum + 1];
 	  console.log(command + " | " + inputString)
-	  runProg()
+	  switch (command) {
+			case "tweets":
+			  tweets();
+			  break;
+			case "spotify-this-song":
+			  spotifyThisSong();
+			  break;
+			case "movie-this":
+			  movieThis();
+			  break;
+			case "do-what-it-says":
+			  doWhatItSays();
+			  break;
+			case "add-command":
+				addRandom();
+				break
+			default:
+			  console.log("Invalid Request");
+		};
 	});
 };
 
@@ -125,35 +144,49 @@ const addRandom = () => {
 	})
 }
 
-// Run the program
-const runProg = () =>{
-	for (let i = 3; i < args.length; i++) {
-		if (i > 3 && i < args.length) {
-			inputString = inputString + "+" + args[i];
-		}else {
-			inputString += args[i];
-		}    
-	};
+const askQuery = (callback) => {
+	inquirer.prompt([
+		{
+			type: "input",
+			name: "query",
+			message: "What do you want to search?"
+		}
+	]).then((input) => {
+		inputString = input.query;
+		callback();
+	})
+}
 
-	switch (command) {
-		case "tweets":
-		  tweets();
-		  break;
-		case "spotify-this-song":
-		  spotifyThisSong();
-		  break;
-		case "movie-this":
-		  movieThis();
-		  break;
-		case "do-what-it-says":
-		  doWhatItSays();
-		  break;
-		case "add-command":
-			addRandom();
-			break
-		default:
-		  console.log("Invalid Request");
-	};
+// Run the program
+const runProg = () => {
+	inquirer.prompt([
+			{
+				type: "list",
+				name: "command",
+				message: "What command do you want to use?",
+				choices: ["tweets", "spotify-this-song", "movie-this", "do-what-it-says", "add-command"]
+			},
+	]).then((input) => {
+		switch (input.command) {
+			case "tweets":
+				askQuery(tweets)
+			  break;
+			case "spotify-this-song":
+			  askQuery(spotifyThisSong);
+			  break;
+			case "movie-this":
+			  askQuery(movieThis);
+			  break;
+			case "do-what-it-says":
+			  doWhatItSays();
+			  break;
+			case "add-command":
+				addRandom();
+				break
+			default:
+			  console.log("Invalid Request");
+		};
+	})
 }
 
 //---------------------------------------------------
