@@ -63,7 +63,7 @@ const spotifyThisSong = () => {
 // Display title, release year, IMDB rating, Rotten Tomatoes rating, Country of production, Language, Plot, Actors in the movie        
 // If no movie input, default to 'Mr. Nobody'. 
 const movieThis = () => {
-	queryUrl = "http://www.omdbapi.com/?apikey=trilogy&y=&plot=short&t=";
+	queryUrl = "http://www.omdbapi.com/?apikey=" + movieKey.apiKey + "&y=&plot=short&t=";
 	if (inputString.length === 0) {
 		queryUrl = queryUrl + "Mr+Nobody";
 	}else{
