@@ -1,19 +1,19 @@
-require("dotenv").config(); 
-const request = require("request"); 
-const keys = require("./keys.js"); 
-const Spotify = require('node-spotify-api'); 
-const Twitter = require('twitter'); 
-const fs = require("fs"); 
+require("dotenv").config();
+const request = require("request");
+const keys = require("./keys.js");
+const Spotify = require('node-spotify-api');
+const Twitter = require('twitter');
+const fs = require("fs");
 const inquirer = require('inquirer');
 const args = process.argv;
-const spotify = new Spotify(keys.spotify); 
-const client = new Twitter(keys.twitter); 
-const movieKey = keys.omdb; 
-let command = args[2]; 
-let input = args[3]; 
-let inputString = ""; 
-let queryUrl; 
-let movieResponse; 
+const spotify = new Spotify(keys.spotify);
+const client = new Twitter(keys.twitter);
+const movieKey = keys.omdb;
+let command = args[2];
+let input = args[3];
+let inputString = "";
+let queryUrl;
+let movieResponse;
 let ranNum;
 
 
@@ -26,10 +26,12 @@ const tweets = () => {
 	if (inputString.length === 0) {
 		inputString = "@realDonaldTrump"
 	};
-	client.get('search/tweets', {q: inputString}, function(error, tweets, response) {
+	client.get('search/tweets', {
+		q: inputString
+	}, function (error, tweets, response) {
 		for (i = 0; i < 10; i++) {
 			console.log(`${i+1}) ` + tweets.statuses[i].created_at + `->` + tweets.statuses[i].text)
-		};    
+		};
 	});
 };
 
@@ -39,11 +41,12 @@ const spotifyThisSong = () => {
 	if (inputString.length === 0) {
 		inputString = "The Sign Ace of Base"
 	}
-		spotify.search({
-		type: 'track',
-		limit: 5,
-		query: inputString },
-		function(err, data) {
+	spotify.search({
+			type: 'track',
+			limit: 5,
+			query: inputString
+		},
+		function (err, data) {
 			if (err) {
 				return console.log("Error occurred: " + err);
 			}
@@ -56,7 +59,7 @@ const spotifyThisSong = () => {
 				console.log("Artist Name: " + data.tracks.items[i].artists[0].name);
 				console.log("Spotify Link: " + data.tracks.items[i].external_urls.spotify);
 				console.log("----------------------------------------")
-			}			
+			}
 		})
 };
 
@@ -66,50 +69,50 @@ const movieThis = () => {
 	queryUrl = "http://www.omdbapi.com/?apikey=" + movieKey.apiKey + "&y=&plot=short&t=";
 	if (inputString.length === 0) {
 		queryUrl = queryUrl + "Mr+Nobody";
-	}else{
+	} else {
 		queryUrl = queryUrl + inputString;
-	};	
-		request(queryUrl, (error, response, body) => {
-			if (!error && response.statusCode === 200) {
-				movieResponse = JSON.parse(body);
-				console.log(
-					"Title: " + movieResponse.Title + " | " + " Year Released: " + movieResponse.Year + " | " + " Language: " 
-					+ movieResponse.Language + " | " + " Produced in: " + movieResponse.Country + " | " + " Cast: " + 
-					movieResponse.Actors + " | " + " Plot: " + movieResponse.Plot + " | " + " Ratings: IMDB: " + 
-					movieResponse.Ratings[0].Value + " | " + " Rotten Tomatoes: " + movieResponse.Ratings[1].Value);
-			};
-		});
+	};
+	request(queryUrl, (error, response, body) => {
+		if (!error && response.statusCode === 200) {
+			movieResponse = JSON.parse(body);
+			console.log(
+				"Title: " + movieResponse.Title + " | " + " Year Released: " + movieResponse.Year + " | " + " Language: " +
+				movieResponse.Language + " | " + " Produced in: " + movieResponse.Country + " | " + " Cast: " +
+				movieResponse.Actors + " | " + " Plot: " + movieResponse.Plot + " | " + " Ratings: IMDB: " +
+				movieResponse.Ratings[0].Value + " | " + " Rotten Tomatoes: " + movieResponse.Ratings[1].Value);
+		};
+	});
 }
 
 // use fs.readfile to use random.txt to call a command
 const doWhatItSays = () => {
-	fs.readFile("random.txt", "utf8", function(error, data) {
-	  if (error) {
-	    return console.log(error);
-	  }
-	  var dataArr = data.split(",");
+	fs.readFile("random.csv", "utf8", function (error, data) {
+		if (error) {
+			return console.log(error);
+		}
+		var dataArr = data.split(",");
 		ranNum = getRanEvNum(dataArr);
 		command = dataArr[ranNum];
-	  inputString = dataArr[ranNum + 1];
-	  console.log(command + " | " + inputString)
-	  switch (command) {
+		inputString = dataArr[ranNum + 1];
+		console.log(command + " | " + inputString)
+		switch (command) {
 			case "tweets":
-			  tweets();
-			  break;
+				tweets();
+				break;
 			case "spotify-this-song":
-			  spotifyThisSong();
-			  break;
+				spotifyThisSong();
+				break;
 			case "movie-this":
-			  movieThis();
-			  break;
+				movieThis();
+				break;
 			case "do-what-it-says":
-			  doWhatItSays();
-			  break;
+				doWhatItSays();
+				break;
 			case "add-command":
 				addRandom();
 				break
 			default:
-			  console.log("Invalid Request");
+				console.log("Invalid Request");
 		};
 	});
 };
@@ -131,37 +134,34 @@ const addRandom = () => {
 		}
 
 	]).then((added) => {
-		fs.appendFile("random.txt",',' + added.newCommand + ',' + '"' + added.newQuery + '"' , function(err) {
-		  if (err) {
-		    console.log(err);
-		  }
-		  else {
-		    console.log("Command Added!");
-		  }
+		fs.appendFile("random.csv", ',' + added.newCommand + ',' + '"' + added.newQuery + '"', function (err) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log("Command Added!");
+			}
 
 		});
 	})
 }
 
 const askQuery = (callback) => {
-	inquirer.prompt([
-		{
-			type: "input",
-			name: "query",
-			message: "What do you want to search?"
-		}
-	]).then((input) => {
+	inquirer.prompt([{
+		type: "input",
+		name: "query",
+		message: "What do you want to search?"
+	}]).then((input) => {
 		inputString = input.query;
 		callback();
 	})
 }
 
 module.exports = {
-	askQuery: askQuery,
-	tweets: tweets,
-	spotifyThisSong: spotifyThisSong,
-	movieThis: movieThis,
-	doWhatItSays: doWhatItSays,
-	addRandom: addRandom,
-	getRanEvNum: getRanEvNum
+	askQuery,
+	tweets,
+	spotifyThisSong,
+	movieThis,
+	doWhatItSays,
+	addRandom,
+	getRanEvNum
 };
